@@ -1,0 +1,29 @@
+﻿@page "/"
+@using SBShared.Models
+@using SBSender.Services
+@inject IQueueService queue
+
+
+<EditForm Model="@person" OnValidSubmit="@PublishMessage">
+    <DataAnnotationsValidator>
+    </DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <InputText id="firstname" @bind-Value="@person.ReservationName"></InputText>
+    <InputText id="lastname" @bind-Value="@person.ReservationIdentifier"></InputText>
+    <button type="submit">Submit</button>
+</EditForm>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code{
+    private ReservationModel person = new ReservationModel();
+
+    private async Task PublishMessage()
+    {
+        await queue.SendMessageAsync(person, "personqueue");
+        person.ReservationName = "";
+        person.ReservationIdentifier = "";
+    }
+
+
+}
